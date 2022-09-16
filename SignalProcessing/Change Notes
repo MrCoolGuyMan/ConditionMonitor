@@ -1,0 +1,17 @@
+
+#Command to make into executable
+#pyinstaller --onefile --name ConditionMonitoring main.py
+"""
+#change notes
+Author      |Date       |comments
+G.Norman    |31-01-22   |First release
+G.Norman    |01-02-22   |timeDomainSignal - load text type changed from int to float
+                        |bugfix - added windowing to timeDomainSignal for PSD graph
+                        |bugfix - changed windowing type from int to float
+                        |Added new button for combining Current and Encoder Data
+                        |Moved button to right hand side for neatness
+G.Norman    |02-02-22   |moved some repeated code into new file "FileSystems"
+                        |Created "MotorClass" - Program will highlight rated RPS on FFT for comparison
+                        |Added radio buttons for selecting motor type
+G.Norman    |18-08-22   |FFT graph will now show harmonics of peak frequency
+"""
