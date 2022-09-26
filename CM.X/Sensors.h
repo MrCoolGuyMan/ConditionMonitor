@@ -18,11 +18,12 @@
 #include <stdbool.h>
 #include "ConditionMonitorConfigFile.h"
 #include "/CAN Protocols/ObjectDictionary/CAN Object Dictionary.h"
+#include "ObjectDictionary.h"
 #include "/IC Drivers/MCP2515 CAN Controller/MCP2515.h"
 
 //for sensors that are constantly read during the Monitoring mode operation
 
-  extern void convertHexToDecAndTransmit(uint8_t identifier,uint32_t InputValue, bool TransmitOnCompletion);  
+    extern void convertHexToDecAndTransmit(uint8_t identifier,uint32_t InputValue, bool TransmitOnCompletion);  
 	typedef struct SensorType
 	{
 		uint8_t Sensor_Type;
@@ -35,7 +36,9 @@
 																 //it needs to accept an EEPROM address for storing the sensor data into EEPROM
         void (*SetupFunction)(void);
 	}SensorClass;
+    
     typedef uint16_t (*Sensorfunction_t)(struct SensorType,uint8_t);
+    
     typedef void (*Sensorsetupfunction_t)(void);
     
     void AddSensor(uint8_t Type, uint8_t startingID, uint24_t COD_INDEX_NUM_CONNECTED, Sensorfunction_t Callback,Sensorsetupfunction_t SetupFunc);

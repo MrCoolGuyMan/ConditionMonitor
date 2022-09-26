@@ -69,8 +69,9 @@
 #define SJW_2TQ         (0b01<<6)
 #define SJW_1TQ         (0b00<<6)
 
-
-#define BAUDRATE_PRESCALER  (3) // This was set to 1 on the old clock
+// 3 = 125 kbit/s
+#define MCP2515_BAUDRATE_PRESCALER_1  (1) 
+#define MCP2515_BAUDRATE_PRESCALER_3  (3) 
 //CNF2 
 #define BLT_MODE_1      (1<<7)      //sets length of Phase segment 2 as determined by PHSEG2 2:0 bits in CFN3
 #define BLT_MODE_0      (0<<7)      //sets length of Phase segment 2 as greater of PS1 and IPT (2 TQ)
@@ -155,7 +156,7 @@ void Repeated_Read_from_CAN_CONTROLLER(uint8_t Start_address);
 unsigned char read_from_CAN_CONTROLLER(uint8_t Address);
 uint8_t Reset_Interrupt_flags_On_CAN_CONTROLLER(void);
 void Reset_CAN_CONTROLLER(void);
-void init_CAN_CONTROLLER(void);
+void init_CAN_CONTROLLER(uint16_t speedSetting_kbit);
 ///send request to send message
 ///data is already loaded into appropriate TX Registers
 void transmit_CAN_Message(uint8_t RTS_REGISTER);

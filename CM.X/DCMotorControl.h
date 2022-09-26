@@ -13,6 +13,7 @@
 #include <xc.h>
 #include "PIC18F Peripheral Drivers/IO_Ports.h"
 #include "ObjectDictionary/CAN Object Dictionary.h"
+#include "ObjectDictionary.h"
 #define MOTOR_TEST_ENABLED 1
 #define MOTOR_TEST_HALTING 0
 #define MOTOR_TEST_DISABLED 2
@@ -56,5 +57,6 @@ void enableCM1(void);
 uint8_t AccelerateMotor(volatile uint8_t *motor_duty_cycle, uint8_t EndDutyCycle);
 void setupPWM(uint8_t startDutyCycle, uint8_t PR_Counter);
 
+void setTestStatus(uint8_t Status);
 #endif	/* MOTORCONTROL_H */
 

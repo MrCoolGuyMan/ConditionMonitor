@@ -16,12 +16,20 @@ static MotorClass DCMotor =
                         }
 };
 extern TimingFlags Timers ;
-extern ProgramFlags OperatingModeFlags ;
+static uint8_t MotorTestStatus = 0;
 
-void checkMotor()
+void setTestStatus(uint8_t Status)
 {
+    MotorTestStatus = Status;
+}
+void checkMotor(void)
+{
+    if(MotorTestStatus  == MOTOR_TEST_DISABLED)
+    {
+         return;
+    }
     //start the motor
-    if(OperatingModeFlags.MotorTestEnabled  == MOTOR_TEST_ENABLED)
+    else if(MotorTestStatus  == MOTOR_TEST_ENABLED)
     {
         if(*DCMotor.Settings.CurrentDutyCycle == 0)  //Motor hasn't started yet
         {
@@ -34,7 +42,7 @@ void checkMotor()
         }
     }
     //stop the motor
-    if(OperatingModeFlags.MotorTestEnabled  == MOTOR_TEST_HALTING)
+    else if(MotorTestStatus == MOTOR_TEST_HALTING)
     {
         if(AccelerateMotor(DCMotor.Settings.CurrentDutyCycle, 0)   == 1)
         {
@@ -51,7 +59,7 @@ void turnoffMotorControl(void)
     CCP2CONbits.CCP2M = 0;  //turn off pwm
    
     //program flag
-    OperatingModeFlags.MotorTestEnabled = MOTOR_TEST_DISABLED;
+    MotorTestStatus = MOTOR_TEST_DISABLED;
     
 }
 

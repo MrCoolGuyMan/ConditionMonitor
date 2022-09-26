@@ -14,7 +14,7 @@ void decodeMessage(uint8_t *Data, uint8_t *DLC, uint16_t *NodeIDWithFunctionCode
     switch(FunctionCode)
     {
         case NMT_NODE_CONTROL:
-            //CANCallbacks[NMT_CALLBACK](Data,DLC,NodeIDWithFunctionCode);
+            CANCallbacks[NMT_CALLBACK](Data,DLC,NodeIDWithFunctionCode);
             break;
             
         case NMT_NODE_MONITOR:

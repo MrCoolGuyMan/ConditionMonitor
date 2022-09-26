@@ -1,15 +1,15 @@
 
 #include "ADXL345 Driver.h"
 
-static uint8_t SPI_deviceID = 0xff;
+
 extern void FormatSensorMetaData(  uint8_t direct_CAN_Transmission,
                             uint8_t Data_MostSig2bits,              //upper 2 bits of 10 bit value; i.e. ADRESH
                             uint8_t Data_LSB,                       //lower 8 bits of 10 bit value; i.e. ADRESL
                             uint8_t Sensor_Type,                    //0-7 bit shifted << 5; forms bits 7:5 of MSB
                             uint8_t sensor_id_with_offset) ;         //0-7 bit shifted << 3; forms bits 4:2 of MSB
                                                                     //Sensor_type, Sensor_id, Data_MS2b will from 1 byte 
+static uint8_t SPI_deviceID = 0xff;
 
-// returns number of connected sensors
 void setup_ACCL(void)
 {
     if(SPI_deviceID == 0xff)

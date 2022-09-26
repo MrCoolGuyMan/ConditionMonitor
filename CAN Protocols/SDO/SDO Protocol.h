@@ -9,6 +9,7 @@
 #define	SDO_PROTOCOL_H
 
 #include "../../CM.X/CustomDataTypes.h"
+#include "/ObjectDictionary/CAN Object Dictionary.h"
 #include "../../CM.X/SDO Application.h"
 #include "/Function Codes/FunctionCodes.h"
 
@@ -40,10 +41,10 @@ respond to service data object message
         uint8_t valid_length;   //but not all bytes are to be read
         uint8_t Data_bytes[8];
     };
-void HANDLE_SDO_READ_REQUEST(struct SDO_TX_CAN *Response,struct C_OD_ENTRY Object_Data);
+void HANDLE_SDO_READ_REQUEST(struct SDO_TX_CAN *Response,uint24_t CAN_Index);
 
 
-void HANDLE_SDO_WRITE_REQUEST(struct SDO_TX_CAN *Response,struct C_OD_ENTRY Object_Data,uint8_t Msg[8]);
+void HANDLE_SDO_WRITE_REQUEST(struct SDO_TX_CAN *Response,uint24_t CAN_Index,uint8_t Msg[8]);
 //respond to a service-data object protocol request
 void Deal_With_SDO(uint8_t Msg[8], uint8_t *DLC, uint16_t *NodeID);
 /*

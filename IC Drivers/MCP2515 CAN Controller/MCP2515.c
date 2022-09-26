@@ -107,7 +107,7 @@ uint8_t Reset_Interrupt_flags_On_CAN_CONTROLLER(void)
          
     return 0;
 }
-void init_CAN_CONTROLLER(void)
+void init_CAN_CONTROLLER(uint16_t speedSetting_kbit)
 {
     if(SPI_deviceID==0xff)
         SPI_deviceID = Add_CS_LATCH(&LATB,4);
@@ -148,10 +148,23 @@ void init_CAN_CONTROLLER(void)
      * CFN3 - address 28
         * PHSEG<2:0>Phase 2 Segment TQ length
      ******/
-   
-        uint8_t Set_CNF1        =SJW_4TQ | BAUDRATE_PRESCALER ;                                 //0b11000001;//0xc1
-        uint8_t Set_CNF2        =BLT_MODE_1|SAM_x1|SET_PHASE_SEG1(4)|SET_PROPAGATION_SEGMENT(5);//0b10101010;//aa
-        uint8_t Set_CNF3        =SET_PHASE_SEG2(6);                                             //0b00000101;//0x5
+    
+    // supports 125, 250 and 500 kbits/s
+    // default settings for 250
+    uint8_t Set_CNF1 =  SJW_4TQ | MCP2515_BAUDRATE_PRESCALER_1;
+    uint8_t Set_CNF2 =  BLT_MODE_1|SAM_x1|SET_PHASE_SEG1(4)|SET_PROPAGATION_SEGMENT(5);
+    uint8_t Set_CNF3 =  SET_PHASE_SEG2(6);     
+
+    if(speedSetting_kbit == 125){
+        Set_CNF1    |=  MCP2515_BAUDRATE_PRESCALER_3 ;    
+    }                                            
+  
+    else if(speedSetting_kbit ==500){
+      
+        Set_CNF2        =BLT_MODE_1|SAM_x1|SET_PHASE_SEG1(2)|SET_PROPAGATION_SEGMENT(2);
+        Set_CNF3        =SET_PHASE_SEG2(3);                                             
+    }
+
 
         write_command_to_CAN_CONTROLLER(CAN_WRITE_COM,CAN_CNF1_REG, Set_CNF1,NOT_CS_HIGH);
 

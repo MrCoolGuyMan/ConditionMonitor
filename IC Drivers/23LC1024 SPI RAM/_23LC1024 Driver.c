@@ -24,7 +24,11 @@ void init_23LC1024_RAM(uint8_t OP_MODE, uint8_t RAM_init_value)
     Clear_23LC1024(RAM_init_value);
 
 }
-
+void _23LC1024incrementAddress(void)
+{	
+    RamBuffer.currentAddress.Addr += RamBuffer.currentSize;
+    RamBuffer.currentSize=0;
+}
 void _23LC1024CheckTransferRequirement(bool ForceWrite)
 {
 	// current size will rollover to zero when the buffer is full
@@ -32,8 +36,7 @@ void _23LC1024CheckTransferRequirement(bool ForceWrite)
 	{
 		Write_Buffer_To_23LC1024();
 		
-		RamBuffer.currentAddress.Addr += RamBuffer.currentSize;
-		RamBuffer.currentSize=0;
+		_23LC1024incrementAddress();
 	}
 }
 void Write_16bit_to_23LC1024_Buffer(uint16_t Data, bool ForceWrite)

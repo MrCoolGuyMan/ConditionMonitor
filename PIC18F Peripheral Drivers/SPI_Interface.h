@@ -136,12 +136,13 @@ typedef struct
                                                     output = SSPBUF;\
                                                     SPI_READ_MACRO;\
                                                     output |= (uint16_t)(SSPBUF<<8);
-uint8_t Add_CS_LATCH(volatile uint8_t *LAT_REG, uint8_t PinNumber);
+
 void SPI_WRITE(unsigned char msg);
 void SPI_MULTI_WRITE(uint8_t num_msgs, ...);
 char READ_SPI(void);
 void spi_comms_setup(uint8_t CKE,uint8_t CKP,uint8_t SSPM);
 
+uint8_t Add_CS_LATCH(volatile uint8_t *LAT_REG, uint8_t PinNumber);
 void SET_CS_LOW(uint8_t deviceID);
 void SET_CS_HIGH(uint8_t deviceID);
 #endif	/* NEWFILE_H */

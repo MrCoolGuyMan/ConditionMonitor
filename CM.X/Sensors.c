@@ -6,7 +6,7 @@
  *
  * Created on 24 November, 2021, 12:50 PM
  */
-    uint8_t MonitoringModeOutput = EEPROM_OUTPUT_MODE;
+
     static uint24_t MonitoringModeStartTime;
 
     static uint16_t Sensor_Checking_Interval=Sampling_period_TMR_Interrupts;
@@ -15,7 +15,6 @@
     static uint8_t MonitoringModeActive;  
     
     extern TimingFlags Timers;
-    extern uint8_t setup_ACCL(void);
  
          
 uint8_t checkMonitoringActive(void)
@@ -37,7 +36,7 @@ void Begin_sensor_monitoring(bool realTimeTransfer)
 {
     for(uint8_t index =0; index <NumberOfSensorsInSensorList ; index++)
     {
-        SensorHeader(index,MonitoringModeOutput);
+        SensorHeader(index,EEPROM_OUTPUT_MODE);
     }
     if(realTimeTransfer == false)
         _23LC1024CheckTransferRequirement(true);
@@ -58,8 +57,10 @@ void setupSensorListCODParameters(void)
 {
     ADRESH = 0;
     ADRESL = 0;
-    MonitoringModeOutput                        =check_current_value_of_8bit_OD_entry(SENSOR_MONITORING_OUTPUT_MODE,true);
-   
+
+    /*
+     call the function to initialise the sensor
+     */
     for(uint8_t index=0; index<NumberOfSensorsInSensorList; index++)
     {
         if(SensorList [index].SetupFunction != NULL)
@@ -67,6 +68,9 @@ void setupSensorListCODParameters(void)
             SensorList [index].SetupFunction();
         }
     }
+    /*
+     Call the function to execute the sensor reading
+     */
     for(uint8_t index =0; index <NumberOfSensorsInSensorList ; index++)
     {
         SensorList[index].number_of_connected_sensors=check_current_value_of_8bit_OD_entry(
@@ -230,10 +234,7 @@ void convertSensorFrequencyToClockMultiple(void)
    
     Sensor_Checking_Interval = (uint16_t)Rate;
 }
-void checkSensorConnections(void)
-{
 
-}
 void setup_monitoring_mode(uint8_t Mode)
 {
     //configure the accelerometer
@@ -243,8 +244,6 @@ void setup_monitoring_mode(uint8_t Mode)
     //turn monitoring on
     if(MonitoringModeActive == 1)
     {
-       
-       // SensorList[VibrationSensor].number_of_connected_sensors = setup_ACCL();
         Sensor_Checking_Interval    =  check_current_value_of_16bit_OD_entry(SENSOR_LOGGING_RATE_CAN_INDEX,false);
         
         convertSensorFrequencyToClockMultiple();

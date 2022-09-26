@@ -43,6 +43,8 @@
 #include "/23LC1024 SPI RAM/_23LC1024 Driver.h"
 #include "/ADXL345 Acc/ADXL345 Driver.h"
 #include "/Humidty Sensor/BME280.h"
+
+bool RealTimeTest = false;
 void setup_heart_beat_command(void);
 void factory_reset(void);
 #define DONT_RESPOND_TO_CAN_MESSAGE 0xff
@@ -78,7 +80,7 @@ void ReadSensorSingleShot(uint8_t Message[8],uint8_t *DLC, uint16_t *NodeIDWithF
 }
 void PDO_ToggleMotor(uint8_t *Message,uint8_t *DLC, uint16_t *NodeIDWithFunctionCode)
 {
-    OperatingModeFlags.MotorTestEnabled = Message[1];
+    setTestStatus(Message[1]);
     
     *NodeIDWithFunctionCode -= 0x20;
     Message[7] = PDO_COMMAND_COMPLETE;
@@ -88,12 +90,17 @@ void PDO_ToggleSensorMonitoringMode(uint8_t *Message,uint8_t *DLC, uint16_t *Nod
 {
     setup_monitoring_mode(Message[1]);
     
+    RealTimeTest = Message[2];
     *DLC = 0;
     *NodeIDWithFunctionCode = DONT_RESPOND_TO_CAN_MESSAGE;
 }
 
 void setupCANCallbacks(void)
 {
+    // can object dictionary
+    SetCODStorageFunction(&Write_Data_to_INTERNAL_EEPROM);
+    SetCODRecallFunction(&Read_From_INTERNAL_EEPROM);
+    
     // basic message decoding 
     SetCANCallback(&decodePDO,PDO_1_CALLBACK);
     
@@ -161,6 +168,7 @@ void setup(void)
        
 	   spi_comms_setup(DEFAULT_SPI_SETTINGS);
 
+       setupCANCallbacks();
 	///check if the internal EEPROM is storing a node id already
 		Assigned_Node_ID=check_current_value_of_8bit_OD_entry(NODE_ID_CAN_INDEX,false);
         
@@ -178,7 +186,11 @@ void setup(void)
 		Reset_CAN_CONTROLLER();   
     
         __delay_ms(1);
-        init_CAN_CONTROLLER();
+        
+        uint16_t BaudRate=check_current_value_of_16bit_OD_entry(CAN_BAUD_CAN_INDEX,false);
+        
+        init_CAN_CONTROLLER(BaudRate);
+
         
         setup_heart_beat_command();
         
@@ -194,7 +206,7 @@ void setup(void)
     
         initSensorList();
         
-        setupCANCallbacks();
+        
     /****
 	 *if the logger was reset during monitoring mode, this will still be active
      *turn off monitoring and sensor transfer
@@ -213,25 +225,23 @@ int main()
             if(CheckIfSensorIntervalTimeHasArrived() == true) 
             {
                 Timers.SensorFlag=0;
-                #define REAL_TIME_MODE_TE
-                #ifdef REAL_TIME_MODE_TEST
+               
+                Begin_sensor_monitoring(RealTimeTest);
                 
-                Begin_sensor_monitoring(true);
+                if(RealTimeTest == true){
+                                    
+                    uint8_t data_len = _23LC1024getCurrentBufferSize();
                 
-                uint8_t data_len = _23LC1024getCurrentBufferSize();
-                
-                if(data_len >=8)
-                {
-                    uint8_t *TX_Data = _23LC1024GrabDataPointer();
-                    for(uint8_t counter = 0 ; counter < data_len; counter+=8)
+                    if(data_len >=8)
                     {
-                        TransmitRawSensorData(&TX_Data[counter]);
+                        uint8_t *TX_Data = _23LC1024GrabDataPointer();
+                        for(uint8_t counter = 0 ; counter < data_len; counter+=8)
+                        {
+                            TransmitRawSensorData(&TX_Data[counter]);
+                        }
+                        _23LC1024incrementAddress();
                     }
-                    Clear_23LC1024_Buffer();
                 }
-                #else
-                Begin_sensor_monitoring(false);
-                #endif
             }
         }
         else
@@ -243,35 +253,18 @@ int main()
                 send_heartbeat_message();
                 TOGGLE_GREEN;
             }
-            if(OperatingModeFlags.MotorTestEnabled  != MOTOR_TEST_DISABLED)
-            {
-               checkMotor();
-            }
-
         }
+        checkMotor();
         //check if any messages are received
         while(CAN_INTERRUPT_PIN==0)///keep checking until all messages have been read
         {
            CAN_RX_Buffer NewMessage = check_RX();
-
-            /*        if(OperatingModeFlags.CAN_MonitoringModeActive==1)
-                    {
-                        SET_CS_HIGH(SPI_deviceID);
-                        //TODO
-                      //  SSPEN = 0;
-                      //  log_CAN_MESSAGE_TO_EEPROM (Data, DLC & 0b00001111,  Node_ID);
-
-                    }*/           
+      
            decodeMessage(NewMessage.Data,&NewMessage.DLC,&NewMessage.MessageID);
 
            respondToCommand(&NewMessage);
         }   
-        
 
-        if(OperatingModeFlags.MotorTestEnabled == MOTOR_TEST_EMERGENCY_HALT)
-        {
-            turnoffMotorControl();
-        }
     }
         
     return (EXIT_SUCCESS);

@@ -7,7 +7,7 @@
 
 #ifndef CONFIG_H
 #define	CONFIG_H
-
+#include <xc.h>
 //Timers
 #define USE_INTERNAL_OSC 0
 #define USE_PLL 1

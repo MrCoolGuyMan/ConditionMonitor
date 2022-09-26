@@ -12,7 +12,7 @@
 extern "C" {
 #endif
 
-
+#include <xc.h>
 void __interrupt(high_priority) tInt(void)
 {
     //Timer 0 interrupts every x us
@@ -32,39 +32,17 @@ void __interrupt(high_priority) tInt(void)
             Timers.EncoderWriteFlag++;
         }
     }
-
-    //timer 1 will overflow when we hit 65536 encoder pulses
-    if(TMR1IF==1)   
-    {
-        EncoderOverflows++;
-        TMR1IF=0;
-    }    
-    if(TMR3IF==1)   
-    {
-        EncoderOverflows2++;
-        TMR3IF=0;
-    }
-    
     //analog - overcurrent protection for motor controller
     if(C1IF==1)
     {
         C1IF=0;
         if(C1OUT == 0)  //Vin- > Vin+
         {
-            static uint8_t makeSureThisIsReal = 0;
-            
-            if(makeSureThisIsReal++ > 5){
-                OperatingModeFlags.MotorTestEnabled = MOTOR_TEST_EMERGENCY_HALT;
-                RED_LED_ON;
-                makeSureThisIsReal=0;
-            }
+            CCP2CONbits.CCP2M = 0;  //turn off pwm
+            RED_LED_ON;
         }
     }
-  /*  if(ADIF==1)
-    {
-        ADCON0 = 0x00; //turn of ADC
-        ADIF=0;
-    }*/
+
 }
 void Interrupt_setup(void)
 {
@@ -99,7 +77,6 @@ void Interrupt_setup(void)
         T1CONbits.SOSCEN = 0;       //dedicated secondary oscillator disabled
        
         TMR1IF = 0;
-        TMR1IE = 1;
         T1CONbits.TMR1ON=1;
      ///Timer3 is used to measure encoder pulses               
         T3CONbits.RD16=1;           //16 bit Read/Write
@@ -107,11 +84,8 @@ void Interrupt_setup(void)
         T3CONbits.SOSCEN = 0;       //dedicated secondary oscillator disabled
        
         TMR3IF = 0;
-        TMR3IE = 1;
         T3CONbits.TMR3ON=1;
-    //ADC interrupts
-      /*  ADIE = 1;
-        ADIF = 0;*/
+
 }
 
 

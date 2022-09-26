@@ -3,9 +3,7 @@
 #define CAN_MSG_DECODER_h
 #include <stdint.h>
 #include "Function Codes/FunctionCodes.h"
-//#include "xc.h"
-//#include "PDO/PDO Protocol.h"
-//#include "SDO/SDO Protocol.h"
+
 
 enum CANCallbackPositions{
     PDO_1_CALLBACK = 0,

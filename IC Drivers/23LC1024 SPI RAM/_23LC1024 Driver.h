@@ -94,4 +94,7 @@ void Clear_23LC1024(uint8_t RAM_init_value);
 
 // overload for 'Clear_23LC1024' - PDO callback requires argument as array
 void Clear_23LC1024_From_PDO(uint8_t *RAM_init_value, uint8_t *DLC, uint16_t *NodeID);
+
+//add current buffer size to the RAM address
+void _23LC1024incrementAddress(void);
 #endif //_23LC1024_DRIVER_H

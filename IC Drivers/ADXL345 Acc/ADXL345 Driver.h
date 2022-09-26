@@ -12,6 +12,7 @@
 #include "/ObjectDictionary/CAN Object Dictionary.h"
 #include <stdint.h>
 #include "Sensors.h"
+#include "ObjectDictionary.h"
 
 #define ACC_SPI_SETTINGS        0,1,_4MHz_CLK
 
